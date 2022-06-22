@@ -110,6 +110,7 @@ def post_edit(request, post_id):
                    }
                   )
 
+
 @login_required
 def add_comment(request, post_id):
     """Добавление комментария к посту -

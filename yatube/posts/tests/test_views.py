@@ -1,7 +1,6 @@
 from http import HTTPStatus
 import shutil
 import tempfile
-import time
 
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase, override_settings
@@ -13,7 +12,6 @@ from django.core.cache import cache
 
 from posts.models import Post, Group, Follow
 from posts.forms import PostForm
-from yatube.settings import CACHES
 
 User = get_user_model()
 
