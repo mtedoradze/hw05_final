@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}
 {% if is_edit %}
-Редактировать пост
+  Редактировать пост
 {% else %}
-Новый пост
+  Новый пост
 {% endif %}
 {% endblock %}
 {% block content %}
@@ -14,29 +14,29 @@
             <div class="card">
               <div class="card-header">       
                 {% if is_edit %}
-                Редактировать пост
+                  Редактировать пост
                 {% else %}
-                Новый пост
+                  Новый пост
                 {% endif %}       
               </div>
               <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
                 {% include 'includes/errors.html' %}
                 {% if is_edit %}
-                <form method="post" action="{% url 'posts:post_edit' post.id %}">
+                  <form method="post" action="{% url 'posts:post_edit' post.id %}">
                 {% else %}
-                <form method="post" action="{% url 'posts:post_create' %}">
+                  <form method="post" action="{% url 'posts:post_create' %}">
                 {% endif %}
                 {% csrf_token %}         
                 {% for field in form %}
-                {% include 'includes/forms_body.html' %}
+                  {% include 'includes/forms_body.html' %}
                 {% endfor %}
                   <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary">
                       {% if is_edit %}
-                      Сохранить
+                        Сохранить
                       {% else %}
-                      Добавить
+                        Добавить
                       {% endif %}
                     </button>
                   </div>

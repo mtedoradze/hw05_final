@@ -6,7 +6,7 @@
   {% load cache %}
   {% cache 20 key_prefix='index_page' %}
   {% for post in page_obj %}
-  {% include 'includes/post_card.html' %}
+    {% include 'includes/post_card.html' %}
   {% endfor %}
   {% include 'posts/includes/paginator.html' %}
   {% endcache %}

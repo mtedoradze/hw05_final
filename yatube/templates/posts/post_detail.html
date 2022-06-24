@@ -13,9 +13,9 @@
               <li class="list-group-item">
                 Группа: {{ post.group.title }}
                 <p> 
-                <a href="{% url 'posts:group_list' post.group.slug %}">
-                  все записи группы
-                </a>
+                  <a href="{% url 'posts:group_list' post.group.slug %}">
+                    все записи группы
+                  </a>
                 </p>
               </li>
             {% endif %}
@@ -39,14 +39,14 @@
           <p> {{post.text}} </p>
           <!-- Если пользователь - автор поста - переход на форму редактирования поста -->
           {% if request.user == post.author %}
-          <a class="btn btn-primary" href="{% url 'posts:post_edit' post.id %}">
-          Редактировать запись
-          </a>
+            <a class="btn btn-primary" href="{% url 'posts:post_edit' post.id %}">
+            Редактировать запись
+            </a>
           {% else %}
-          <!-- Если пользователь - НЕ автор поста - он останется на странице поста -->
-          <a class="btn btn-primary" href="{% url 'posts:post_detail' post.id %}">
-          Редактировать запись
-          </a>
+            <!-- Если пользователь - НЕ автор поста - он останется на странице поста -->
+            <a class="btn btn-primary" href="{% url 'posts:post_detail' post.id %}">
+            Редактировать запись
+            </a>
           {% endif %}
 
           {% include 'posts/includes/comment_create.html' %}

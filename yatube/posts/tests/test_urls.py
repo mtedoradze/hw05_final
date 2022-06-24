@@ -2,6 +2,8 @@ from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
+from django.urls import reverse
+from django.core.cache import cache
 
 from posts.models import Post, Group
 
@@ -25,16 +27,31 @@ class PostsURLTests(TestCase):
             author=cls.user_author
         )
         cls.common_urls_templates = (
-            ('/', 'posts/index.html'),
-            ('/group/test_slug/', 'posts/group_list.html'),
-            ('/profile/test_author/', 'posts/profile.html'),
-            ('/posts/1/', 'posts/post_detail.html')
+            (
+                reverse('posts:index'),
+                'posts/index.html'
+            ),
+            (
+                reverse('posts:group_list', args=(cls.group.slug,)),
+                'posts/group_list.html'
+            ),
+            (
+                reverse('posts:profile', args=(cls.user_author,)),
+                'posts/profile.html'
+            ),
+            (
+                reverse('posts:post_detail', args=(cls.post.id,)),
+                'posts/post_detail.html'
+            )
         )
         cls.create_url_template = (
-            ('/create/', 'posts/post_create.html'),
+            (reverse('posts:post_create'), 'posts/post_create.html'),
         )
         cls.edit_url_template = (
-            ('/posts/1/edit/', 'posts/post_create.html'),
+            (
+                reverse('posts:post_edit', args=(cls.post.id,)),
+                'posts/post_create.html'
+            ),
         )
 
     def setUp(self):
@@ -45,6 +62,7 @@ class PostsURLTests(TestCase):
         self.user = User.objects.create_user(username='Authorized_user')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        cache.clear()
 
     def test_pages_accessability_templates_redirects_for_anonimous(self):
         """Проверка доступности страниц, шаблонов доступных страниц
@@ -57,13 +75,17 @@ class PostsURLTests(TestCase):
                 )
                 self.assertTemplateUsed(response, template)
 
+        redirect_reverse = reverse('users:login')
         for url, template in PostsURLTests.create_url_template:
             with self.subTest(url=url):
                 response = self.guest_client.get(url)
                 self.assertEqual(
                     response.status_code, HTTPStatus.FOUND
                 )
-                self.assertRedirects(response, '/auth/login/?next=/create/')
+                self.assertRedirects(
+                    response,
+                    f'{redirect_reverse}?next={url}'
+                )
 
         for url, template in PostsURLTests.edit_url_template:
             with self.subTest(url=url):
@@ -72,7 +94,8 @@ class PostsURLTests(TestCase):
                     response.status_code, HTTPStatus.FOUND
                 )
                 self.assertRedirects(
-                    response, '/auth/login/?next=/posts/1/edit/'
+                    response,
+                    f'{redirect_reverse}?next={url}'
                 )
 
     def test_pages_accessability_templates_redirects_for_authorized(self):
@@ -98,7 +121,10 @@ class PostsURLTests(TestCase):
                 self.assertEqual(
                     response.status_code, HTTPStatus.FOUND
                 )
-                self.assertRedirects(response, '/posts/1/')
+                self.assertRedirects(
+                    response,
+                    reverse('posts:post_detail', args=(PostsURLTests.post.id,))
+                )
 
     def test_pages_accessability_templates_for_author(self):
         """Проверка доступности страниц и их шаблонов для автора поста

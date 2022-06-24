@@ -8,6 +8,7 @@ from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.cache import cache
 
 User = get_user_model()
 
@@ -38,6 +39,7 @@ class PostModelTest(TestCase):
         self.user = User.objects.create_user(username='Authorized_user')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        cache.clear()
 
     def test_create_post(self):
         """Валидная форма создает запись в Post (с картинкой).
@@ -67,7 +69,7 @@ class PostModelTest(TestCase):
             follow=True
         )
         self.assertEqual(Post.objects.count(), 1)
-        self.assertEqual(Post.objects.first().text, 'Новый текст из формы')
+        self.assertEqual(Post.objects.first().text, form_data['text'])
         self.assertEqual(Post.objects.first().group, PostModelTest.group)
         self.assertEqual(Post.objects.first().author, self.user)
         self.assertEqual(Post.objects.first().image, 'posts/small.gif')
@@ -96,17 +98,19 @@ class PostModelTest(TestCase):
             follow=True
         )
         self.assertEqual(Post.objects.count(), self.posts_count)
-        self.assertEqual(Post.objects.first().text, 'Новый текст из формы')
+        self.assertEqual(Post.objects.first().text, form_data['text'])
         self.assertEqual(Post.objects.first().author, self.user)
         self.assertEqual(Post.objects.first().group, PostModelTest.group)
 
     def test_post_creation_for_anonimous(self):
         """Неавторизованный пользователь не может создать пост."""
         self.guest_client = Client()
-        response = self.guest_client.get(reverse('posts:post_create'))
+        url = reverse('posts:post_create')
+        response = self.guest_client.get(url)
+        redirect_reverse = reverse('users:login')
         self.assertRedirects(
             response,
-            reverse('users:login') + '?next=/create/'
+            f'{redirect_reverse}?next={url}'
         )
 
     def test_comment_appears_on_post_detail_page(self):
@@ -133,7 +137,4 @@ class PostModelTest(TestCase):
         self.assertIsInstance(
             response.context['form'], CommentForm
         )
-        self.assertEqual(
-            str(response_post_detail.context['comments'][0].text),
-            form_data['text']
-        )
+        self.assertIn(form_data['text'], response_post_detail.content.decode())

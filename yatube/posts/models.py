@@ -33,13 +33,6 @@ class Post(models.Model):
         upload_to='posts/',
         blank=True
     )
-    comment = models.ForeignKey(
-        'Comment',
-        related_name='posts',
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL
-    )
 
     class Meta:
         ordering = ['-pub_date']

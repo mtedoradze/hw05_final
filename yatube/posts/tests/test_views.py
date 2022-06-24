@@ -13,6 +13,7 @@ from django.core.cache import cache
 from posts.models import Post, Group, Follow
 from posts.forms import PostForm
 
+
 User = get_user_model()
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -196,7 +197,7 @@ class PostsPagesTests(TestCase):
             with self.subTest(url=url):
                 response = self.author.get(url)
                 self.post_first = response.context['page_obj'][0]
-                self.assertEqual(self.post_first.text, 'Текст с картинкой')
+                self.assertEqual(self.post_first.text, post_with_pic.text)
                 self.assertEqual(self.post_first.image, 'posts/small.gif')
         response_post_detail = self.author.get(reverse
                                                (
@@ -221,34 +222,39 @@ class PostsPagesTests(TestCase):
         for object in PostsPagesTests.paginated_urls:
             for url, template in object:
                 with self.subTest(url=url):
+                    posts_on_second_page = Post.objects.count()
+                    - settings.POSTS_PER_PAGE
                     response_first_page = self.author.get(url)
                     response_second_page = self.author.get(
-                        url + '?page=2'
+                        f'{url}?page=2'
                     )
                     self.assertEqual
                     (
                         len(response_first_page.context['page_obj']),
-                        10
+                        settings.POSTS_PER_PAGE
                     )
                     self.assertEqual
                     (
                         len(response_second_page.context['page_obj']),
-                        2
+                        posts_on_second_page
                     )
 
     def test_comments_accessability_for_anonimous(self):
         """Проверка, что комментировать посты может только
         авторизованный пользователь."""
         self.guest_client = Client()
-        response_guest = self.guest_client.get('/posts/1/comment/')
-        response_authorized = self.authorized_client.get(
-            reverse('posts:add_comment', args=(PostsPagesTests.post.id,))
+        url = reverse('posts:add_comment', args=(PostsPagesTests.post.id,))
+        response_guest = self.guest_client.get(url)
+        response_authorized = self.authorized_client.get(url)
+        redirect_reverse_guest = reverse('users:login')
+        self.assertRedirects(
+            response_guest, f'{redirect_reverse_guest}?next={url}'
         )
         self.assertRedirects(
-            response_guest, '/auth/login/?next=/posts/1/comment/'
-        )
-        self.assertRedirects(
-            response_authorized, '/posts/1/'
+            response_authorized, reverse(
+                'posts:post_detail',
+                args=(PostsPagesTests.post.id,)
+            )
         )
 
     def test_index_page_cache(self):

@@ -20,7 +20,7 @@
                 <a class="nav-link" {% if view_name  == 'about:tech' %}active{% endif %}
                   href="{% url 'about:tech' %}"
                 >
-                Технологии
+                  Технологии
               </a>
               </li>
               <!-- пункты меню видны только авторизованному пользователю -->
@@ -29,21 +29,21 @@
                 <a class="nav-link" {% if view_name  == 'posts:post_create' %}active{% endif %}
                   href="{% url 'posts:post_create' %}"
                 >
-                Новая запись
+                  Новая запись
               </a>
               </li>
               <li class="nav-item"> 
                 <a class="nav-link link-light" {% if view_name  == 'users:password_reset' %}active{% endif %}
                   href="{% url 'users:password_reset' %}"
                 >
-                Изменить пароль
+                  Изменить пароль
               </a>
               </li>
               <li class="nav-item"> 
                 <a class="nav-link link-light" {% if view_name  == 'users:logout' %}active{% endif %}
                   href="{% url 'users:logout' %}"
                 >
-                Выйти
+                  Выйти
                 </a>
               </li>
               <li>
@@ -55,14 +55,14 @@
                 <a class="nav-link link-light" {% if view_name  == 'users:login' %}active{% endif %}
                   href="{% url 'users:login' %}"
                 >
-                Войти
+                  Войти
                 </a>
               </li>
               <li class="nav-item"> 
                 <a class="nav-link link-light" {% if view_name  == 'users:signup' %}active{% endif %}
                   href="{% url 'users:signup' %}"
                 >
-                Регистрация
+                  Регистрация
                 </a>
               </li>
               {% endif %}
