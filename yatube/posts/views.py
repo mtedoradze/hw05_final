@@ -111,11 +111,12 @@ def add_comment(request, post_id):
     доступно только авторизованному пользователю."""
     post = get_object_or_404(Post, id=post_id)
     form = CommentForm(request.POST or None)
-    if form.is_valid():
-        comment = form.save(commit=False)
-        comment.author = request.user
-        comment.post = post
-        comment.save()
+    if not form.is_valid():
+        return redirect('posts:post_detail', post_id=post_id)
+    comment = form.save(commit=False)
+    comment.author = request.user
+    comment.post = post
+    comment.save()
     return redirect('posts:post_detail', post_id=post_id)
 
 
@@ -123,9 +124,8 @@ def add_comment(request, post_id):
 def follow_index(request):
     """Страница постов авторов, на которых подписан
     пользователь."""
-    user = get_object_or_404(User, username=request.user)
     post_list = Post.objects.filter(
-        author__following__user=user
+        author__following__user=request.user
     ).select_related('author', 'group')
     page_obj = utils.paginate_page(request, post_list)
     context = {
@@ -136,13 +136,14 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    if get_object_or_404(
-        User,
-        username=username
-    ) == request.user or Follow.objects.filter(
-        user=request.user,
-        author=(User.objects.get(username=username))
-    ).exists():
+    author = get_object_or_404(User, username=username)
+    if (
+        author == request.user
+        or Follow.objects.filter(
+            user=request.user,
+            author=(User.objects.get(username=username))
+            ).exists()
+    ):
         return redirect('posts:profile', request.user)
     Follow.objects.create(
         user=request.user,

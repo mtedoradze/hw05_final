@@ -15,4 +15,5 @@ Django 2.2.16
 
 ## Автор
 Мария Тедорадзе
+[mtedoradze · GitHub](https://github.com/mtedoradze)
 #добро пожаловать/публиковать#
