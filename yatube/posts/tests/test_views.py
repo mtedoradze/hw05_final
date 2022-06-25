@@ -97,7 +97,7 @@ class PostsPagesTests(TestCase):
         self.author = Client()
         self.author.force_login(self.user_author)
         self.user = User.objects.create_user(username='Authorized_user')
-        self.authorized_client = Client()           
+        self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
         cache.clear()
 
