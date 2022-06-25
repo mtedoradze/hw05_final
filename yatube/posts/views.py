@@ -142,7 +142,7 @@ def profile_follow(request, username):
         or Follow.objects.filter(
             user=request.user,
             author=(User.objects.get(username=username))
-            ).exists()
+        ).exists()
     ):
         return redirect('posts:profile', request.user)
     Follow.objects.create(
