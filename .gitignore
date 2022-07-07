@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+.env
+
 # Distribution / packaging
 .Python
 build/
@@ -149,4 +151,3 @@ dmypy.json
 static/
 yatube/posts/static/
 yatube/media/
-
